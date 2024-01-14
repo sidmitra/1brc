@@ -1,3 +1,6 @@
+"""
+With simple class based struct
+"""
 import sys
 from collections import defaultdict
 
@@ -10,13 +13,9 @@ class Station:
     def mean(self):
         return self.sum / self.count
 
-
 measurements = defaultdict(Station)
 
-# python main "./1brc/measurements.txt"
-if __name__ == "__main__":
-    filename = sys.argv[1]
-
+def process(filename):
     with open(filename, 'r') as infile:
         for line in infile:
             station, temp = line.split(";")
@@ -39,3 +38,9 @@ if __name__ == "__main__":
             suffix = ""
         print(f"{station}={data.min}/{data.mean():.1f}/{data.max}" ,end=suffix)
     print("}", end="")
+
+
+# python main "./1brc/measurements.txt"
+if __name__ == "__main__":
+    filename = sys.argv[1]
+    process(filename)
