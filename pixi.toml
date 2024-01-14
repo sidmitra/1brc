@@ -9,3 +9,5 @@ platforms = ["osx-64", "linux-64"]
 [tasks]
 
 [dependencies]
+python = ">=3.12.1,<3.13"
+pip = ">=23.3.2,<23.4"
