@@ -17,27 +17,24 @@ measurements: dict[str, Station] = {}
 def process(filename):
     with open(filename, 'r') as infile:
         for line in infile:
-            station, temp_s = line.split(";")
+            name, temp_s = line.split(";")
             temp = float(temp_s)
-
-            if station not in measurements:
-                measurements[station] = Station(min=temp, max=temp, sum=temp, count=1)
+            if (station := measurements.get(name)) is not None:
+                station.min = min(s.min, temp)
+                station.max = max(s.max, temp)
+                station.sum += temp
+                station.count += 1
             else:
-                if temp < measurements[station].min:
-                    measurements[station].min = temp
-                if temp > measurements[station].max:
-                    measurements[station].max = temp
+                measurements[name] = Station(min=temp, max=temp, sum=temp, count=1)
 
-                measurements[station].sum += temp
-                measurements[station].count += 1
 
     count = len(measurements)
     print("{", end="")
-    for n, (station, data) in enumerate(sorted(measurements.items())):
+    for n, (name, data) in enumerate(sorted(measurements.items())):
         suffix = ","
         if n == count - 1:
             suffix = ""
-        print(f"{station}={data.min}/{mean(data):.1f}/{data.max}" ,end=suffix)
+        print(f"{name}={data.min}/{mean(data):.1f}/{data.max}", end=suffix)
     print("}", end="")
 
 
