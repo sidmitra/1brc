@@ -1,0 +1,32 @@
+name: benchmark
+on:
+  push:
+    branches:
+    - main
+    - SM-*
+
+jobs:
+
+  benchmark:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - '3.12.1'
+          - 'pypy3.9-nightly'
+        script-file:
+          - 'naive_with_class.py'
+          - 'naive_with_dataclass.py'
+        input-file:
+          - 'inputs/measurements-10000-unique-keys.txt'
+    steps:
+        - uses: actions/setup-python@main
+          with:
+            python-version: ${{ matrix.python-version }}
+        - uses: actions/checkout@main
+        - name: Run benchmark
+          env:
+            SCRIPT_FILE: ${{ matrix.script-file }}
+            INPUT_FILE: ${{ matrix.input-file }}
+          run: |
+            python $SCRIPT_FILE $INPUT_FILE
