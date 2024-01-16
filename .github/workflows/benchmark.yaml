@@ -15,18 +15,25 @@ jobs:
           - '3.12.1'
           - 'pypy3.9-nightly'
         script-file:
-          - 'naive_with_class.py'
-          - 'naive_with_dataclass.py'
+          - 'naive_with_class'
+          - 'naive_with_dataclass'
         input-file:
-          - 'inputs/measurements-10000-unique-keys.txt'
+          - 'inputs/measurements-10000-unique-keys'
     steps:
+        - uses: actions/checkout@main
         - uses: actions/setup-python@main
           with:
             python-version: ${{ matrix.python-version }}
-        - uses: actions/checkout@main
+        - name: Install hyperfine
+          run: |
+            sudo apt -y install hyperfine
         - name: Run benchmark
           env:
-            SCRIPT_FILE: ${{ matrix.script-file }}
-            INPUT_FILE: ${{ matrix.input-file }}
+            SCRIPT_FILE: ${{ matrix.script-file }}.py
+            INPUT_FILE: ${{ matrix.input-file }}.txt
           run: |
-            python $SCRIPT_FILE $INPUT_FILE
+            hyperfine 'python $SCRIPT_FILE $INPUT_FILE' --warmup=3 --runs=5 --export-json=.hyperfine.json
+        - uses: actions/upload-artifact@main
+          with:
+            name: ${{ matrix.python-version }}-${{ matrix.script-file }}-${{ matrix.input-file }}.json
+            path: .hyperfine.json
