@@ -17,8 +17,9 @@ jobs:
         script-file:
           - 'naive_with_class'
           - 'naive_with_dataclass'
+          - 'naive_with_tuple'
         input-file:
-          - 'inputs/measurements-10000-unique-keys'
+          - 'measurements-10000-unique-keys'
     steps:
         - uses: actions/checkout@main
         - uses: actions/setup-python@main
@@ -30,7 +31,7 @@ jobs:
         - name: Run benchmark
           env:
             SCRIPT_FILE: ${{ matrix.script-file }}.py
-            INPUT_FILE: ${{ matrix.input-file }}.txt
+            INPUT_FILE: inputs/${{ matrix.input-file }}.txt
           run: |
             hyperfine 'python $SCRIPT_FILE $INPUT_FILE' --warmup=3 --runs=5 --export-json=.hyperfine.json
         - uses: actions/upload-artifact@main
