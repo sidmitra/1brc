@@ -1,3 +1,7 @@
+"""
+`mypyc mypy_*.py` generates .so files for the machine arch.
+
+"""
 import sys
 
 if __name__ == "__main__":

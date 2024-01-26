@@ -1,5 +1,5 @@
 import sys
-from typing import Self, Optional
+from typing import Self
 from dataclasses import dataclass
 
 @dataclass
@@ -9,11 +9,11 @@ class Station:
     sum: float
     count: int
 
-    def mean(self: Self):
+    def mean(self: Self) -> float:
         return self.sum / self.count
 
 
-def process(filename: str):
+def process(filename: str) -> None:
     measurements: dict[str, Station] = {}
 
     with open(filename, 'r') as infile:
