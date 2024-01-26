@@ -1,5 +1,6 @@
+*.so
 .pixi
 1brc*
-*.so
+__pycache__
 build/
 outputs/
