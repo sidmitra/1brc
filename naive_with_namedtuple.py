@@ -1,8 +1,7 @@
 """
-With dataclasses
+With namedtuple
 """
 import sys
-from dataclasses import dataclass
 from collections import namedtuple
 
 
@@ -11,7 +10,7 @@ Station = namedtuple("Station", "min max sum count")
 def mean(station):
     return station.sum / station.count
 
-measurements: dict[str, Station] = {}
+measurements: dict = {}
 
 
 def process(filename):
@@ -20,10 +19,11 @@ def process(filename):
             name, temp_s = line.split(";")
             temp = float(temp_s)
             if (station := measurements.get(name)) is not None:
-                station.min = min(s.min, temp)
-                station.max = max(s.max, temp)
-                station.sum += temp
-                station.count += 1
+                _min = min(station.min, temp)
+                _max = max(station.min, temp)
+                _sum = station.sum + temp
+                _count = station.count+1
+                measurements[name] = Station(min=_min, max=_max, sum=_sum, count=_count)
             else:
                 measurements[name] = Station(min=temp, max=temp, sum=temp, count=1)
 
