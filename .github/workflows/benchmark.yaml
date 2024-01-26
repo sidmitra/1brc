@@ -1,0 +1,40 @@
+name: benchmark
+on:
+  push:
+    branches:
+    - main
+    - SM-*
+
+jobs:
+
+  benchmark:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - '3.12.1'
+          - 'pypy3.9-nightly'
+        script-file:
+          - 'naive_with_class'
+          - 'naive_with_dataclass'
+          - 'naive_with_tuple'
+        input-file:
+          - 'measurements-10000-unique-keys'
+    steps:
+        - uses: actions/checkout@main
+        - uses: actions/setup-python@main
+          with:
+            python-version: ${{ matrix.python-version }}
+        - name: Install hyperfine
+          run: |
+            sudo apt -y install hyperfine
+        - name: Run benchmark
+          env:
+            SCRIPT_FILE: ${{ matrix.script-file }}.py
+            INPUT_FILE: inputs/${{ matrix.input-file }}.txt
+          run: |
+            hyperfine 'python $SCRIPT_FILE $INPUT_FILE' --warmup=3 --runs=5 --export-json=.hyperfine.json
+        - uses: actions/upload-artifact@main
+          with:
+            name: ${{ matrix.python-version }}-${{ matrix.script-file }}-${{ matrix.input-file }}.json
+            path: .hyperfine.json
