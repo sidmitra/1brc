@@ -1,0 +1,11 @@
+[project]
+name = "1brc"
+version = "0.1.0"
+description = "One Billion Row Challege (with Python)"
+authors = ["Sid Mitra <github@sidmitra.com>"]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "mypyc>=0.0.1",
+    "scalene>=1.5.51",
+]
