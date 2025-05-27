@@ -22,7 +22,9 @@ jobs:
         input-file:
           - 'measurements-10000-unique-keys'
     steps:
-        - uses: actions/checkout@main
+        - uses: actions/checkout@v4
+        - name: Install uv
+          uses: astral-sh/setup-uv@v5
         - uses: actions/setup-python@main
           with:
             python-version: ${{ matrix.python-version }}
@@ -39,3 +41,52 @@ jobs:
           with:
             name: ${{ matrix.python-version }}-${{ matrix.script-file }}-${{ matrix.input-file }}.json
             path: .hyperfine.json
+
+  report:
+    runs-on: ubuntu-latest
+    needs: benchmark
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+    - name: Generate combined report
+      run: |
+          echo "Benchmark Results Summary"
+          echo "=========================="
+
+          # Simple script to parse and combine results
+          python -c '
+import json
+import os
+import glob
+from collections import defaultdict
+
+# Group results by input file
+results_by_input = defaultdict(list)
+
+for file in glob.glob("artifacts/**/*.json"):
+    parts = file.split("/")[1].split(".")[0].split("-")
+    python_ver = parts[0]
+    script = parts[1]
+    input_file = "-".join(parts[2:])
+
+    with open(file, "r") as f:
+        data = json.load(f)
+        mean = data["results"][0]["mean"]
+        stddev = data["results"][0]["stddev"]
+
+    results_by_input[input_file].append((python_ver, script, mean, stddev))
+
+# Print results grouped by input file
+for input_file, results in results_by_input.items():
+    print(f"\n== Results for {input_file} ==")
+    print(f"{"Python Version":<15} {"Script":<20} {"Time":<15}")
+    print("-" * 50)
+
+    # Sort by mean time within each group
+    results.sort(key=lambda x: x[2])
+
+    for python_ver, script, mean, stddev in results:
+        print(f"{python_ver:<15} {script:<20} {mean:.4f}s ± {stddev:.4f}s")
+'
