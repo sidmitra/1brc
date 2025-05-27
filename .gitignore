@@ -1,6 +1,8 @@
 *.so
+.DS_Store
 .pixi
 1brc*
 __pycache__
 build/
 outputs/
+target/
